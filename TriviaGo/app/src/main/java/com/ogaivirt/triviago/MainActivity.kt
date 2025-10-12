@@ -14,6 +14,11 @@ import com.ogaivirt.triviago.ui.screens.login.LoginScreen
 import com.ogaivirt.triviago.ui.screens.register.RegisterScreen
 import com.ogaivirt.triviago.ui.theme.TriviaGoTheme
 import dagger.hilt.android.AndroidEntryPoint
+import com.ogaivirt.triviago.ui.screens.home.HomeScreen
+import com.ogaivirt.triviago.ui.screens.profile.ProfileScreen
+import com.ogaivirt.triviago.ui.screens.splash.SplashScreen
+
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -25,17 +30,58 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navController = rememberNavController() // Kreiramo kontroler za navigaciju
+                    val navController = rememberNavController()
 
                     NavHost(
                         navController = navController,
-                        startDestination = "login" // Početni ekran je "login"
+                        startDestination = "splash"
                     ) {
+
+                        composable("splash") {
+                            SplashScreen(
+                                onNavigateToLogin = {
+                                    navController.navigate("login") {
+                                        popUpTo("splash") { inclusive = true }
+                                    }
+                                },
+                                onNavigateToHome = {
+                                    navController.navigate("home") {
+                                        popUpTo("splash") { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+
                         composable("login") {
-                            LoginScreen() // Kada je ruta "login", prikaži LoginScreen
+                            LoginScreen(
+                                onNavigateToRegister = { navController.navigate("register") },
+                                onLoginSuccess = {
+                                    navController.navigate("home") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                }
+                            )
                         }
                         composable("register") {
-                            RegisterScreen() // Kada je ruta "register", prikaži RegisterScreen
+                            RegisterScreen(onNavigateToLogin = {
+                                navController.navigate("login"){
+                                    popUpTo("login") { inclusive = true }
+                                }
+                            })
+                        }
+
+                        composable("home") {
+                            HomeScreen(onNavigateToProfile = { navController.navigate("profile") })
+                        }
+
+                        composable("profile") {
+                            ProfileScreen(
+                                onSignOut = {
+                                    navController.navigate("login") {
+                                        popUpTo(0)
+                                    }
+                                }
+                            )
                         }
                     }
                 }

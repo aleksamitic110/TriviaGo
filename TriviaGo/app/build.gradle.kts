@@ -66,7 +66,21 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
 
+    //HILT
     implementation("com.google.dagger:hilt-android:2.51.1")
     kapt("com.google.dagger:hilt-compiler:2.51.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+    //FIREBASE
+    implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx")
+
+
+    //OSTALO
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation("com.airbnb.android:lottie-compose:6.4.1")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
 }

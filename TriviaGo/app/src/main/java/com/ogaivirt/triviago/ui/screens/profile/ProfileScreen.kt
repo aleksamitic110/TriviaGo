@@ -1,5 +1,6 @@
 package com.ogaivirt.triviago.ui.screens.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
@@ -11,6 +12,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,6 +26,20 @@ fun ProfileScreen(
     onSignOut: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            uri?.let { viewModel.onProfilePictureChange(it) }
+        }
+    )
+
+    LaunchedEffect(uiState.infoMessage) {
+        uiState.infoMessage?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            viewModel.onInfoMessageShown()
+        }
+    }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Podešavanja profila") }) }
@@ -44,9 +65,9 @@ fun ProfileScreen(
                     contentDescription = "Slika profila",
                     modifier = Modifier
                         .size(120.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop,
-                    // TODO: Dodati placeholder sliku
+                        .clip(CircleShape)
+                        .clickable { singlePhotoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                    contentScale = ContentScale.Crop
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

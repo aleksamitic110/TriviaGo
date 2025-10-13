@@ -1,5 +1,6 @@
 package com.ogaivirt.triviago.ui.screens.profile
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ogaivirt.triviago.domain.model.UserProfile
@@ -14,7 +15,8 @@ import javax.inject.Inject
 data class ProfileUiState(
     val isLoading: Boolean = true,
     val userProfile: UserProfile? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val infoMessage: String? = null
 )
 
 @HiltViewModel
@@ -35,7 +37,12 @@ class ProfileViewModel @Inject constructor(
             repo.getUserProfile().onSuccess { profile ->
                 _uiState.update { it.copy(isLoading = false, userProfile = profile) }
             }.onFailure { exception ->
-                _uiState.update { it.copy(isLoading = false, errorMessage = exception.localizedMessage) }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = exception.localizedMessage
+                    )
+                }
             }
         }
     }
@@ -56,9 +63,9 @@ class ProfileViewModel @Inject constructor(
         val profile = uiState.value.userProfile ?: return
         viewModelScope.launch {
             repo.updateUserProfile(profile.username, profile.description ?: "").onSuccess {
-                // TODO: Prikaži poruku o uspešnom čuvanju
-            }.onFailure {
-                // TODO: Prikaži grešku
+                _uiState.update { it.copy(infoMessage = "Podaci uspešno sačuvani!") }
+            }.onFailure { exception ->
+                _uiState.update { it.copy(infoMessage = "Greška: ${exception.localizedMessage}") }
             }
         }
     }
@@ -67,5 +74,33 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             repo.signOut()
         }
+    }
+
+
+    fun onProfilePictureChange(uri: Uri) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            repo.uploadProfilePicture(uri).onSuccess { downloadUrl ->
+
+                repo.updateProfilePictureUrl(downloadUrl).onSuccess {
+
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            userProfile = it.userProfile?.copy(profilePictureUrl = downloadUrl)
+                        )
+                    }
+                }.onFailure { exception ->
+                    _uiState.update { it.copy(infoMessage = "Greška: ${exception.localizedMessage}") }
+                }.onFailure { exception ->
+                    _uiState.update { it.copy(infoMessage = "Greška: ${exception.localizedMessage}") }
+                    _uiState.update { it.copy(isLoading = false) }
+                }
+            }
+        }
+    }
+
+    fun onInfoMessageShown() {
+        _uiState.update { it.copy(infoMessage = null) }
     }
 }

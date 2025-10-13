@@ -12,12 +12,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Add
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    onNavigateToProfile: () -> Unit
+    onNavigateToProfile: () -> Unit,
+    onNavigateToCreateQuiz: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -32,6 +34,11 @@ fun HomeScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onNavigateToCreateQuiz) {
+                Icon(Icons.Default.Add, contentDescription = "Napravi kviz")
+            }
         }
     ) { innerPadding ->
         Box(

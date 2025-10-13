@@ -1,4 +1,5 @@
 package com.ogaivirt.triviago.domain.repository
+import android.net.Uri
 import com.google.firebase.auth.FirebaseUser
 import com.ogaivirt.triviago.domain.model.UserProfile
 
@@ -15,5 +16,6 @@ interface AuthRepository {
     suspend fun getUserProfile(): Result<UserProfile?>
     suspend fun updateUserProfile(username: String, description: String): Result<Unit>
 
-
+    suspend fun uploadProfilePicture(uri: Uri): Result<String>
+    suspend fun updateProfilePictureUrl(url: String): Result<Unit>
 }

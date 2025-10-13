@@ -7,9 +7,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.ogaivirt.triviago.ui.screens.add_questions.AddQuestionsScreen
+import com.ogaivirt.triviago.ui.screens.create_quiz.CreateQuizScreen
 import com.ogaivirt.triviago.ui.screens.login.LoginScreen
 import com.ogaivirt.triviago.ui.screens.register.RegisterScreen
 import com.ogaivirt.triviago.ui.theme.TriviaGoTheme
@@ -71,7 +75,30 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("home") {
-                            HomeScreen(onNavigateToProfile = { navController.navigate("profile") })
+                            HomeScreen(onNavigateToProfile = { navController.navigate("profile") },
+                                       onNavigateToCreateQuiz = { navController.navigate("create_quiz")}
+                            )
+                        }
+
+                        composable("create_quiz") {
+                            CreateQuizScreen(
+                                onNavigateToAddQuestions = { quizId ->
+                                    navController.navigate("add_questions/$quizId")
+                                }
+                            )
+                        }
+
+                        composable(
+                            route = "add_questions/{quizId}",
+                            arguments = listOf(navArgument("quizId") { type = NavType.StringType })
+                        ) {
+                            AddQuestionsScreen(
+                                onFinishQuizCreation = {
+                                    navController.navigate("home") {
+                                        popUpTo("home") { inclusive = true }
+                                    }
+                                }
+                            )
                         }
 
                         composable("profile") {

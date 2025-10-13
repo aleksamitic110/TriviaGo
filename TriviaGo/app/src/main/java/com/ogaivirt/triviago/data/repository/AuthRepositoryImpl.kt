@@ -9,11 +9,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ogaivirt.triviago.domain.model.UserProfile
-
+import android.net.Uri
+import com.google.firebase.storage.FirebaseStorage
 class AuthRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val googleSignInClient: GoogleSignInClient,
-    private val db: FirebaseFirestore
+    private val db: FirebaseFirestore,
+    private val storage: FirebaseStorage
 ) : AuthRepository {
 
     override suspend fun createUserWithEmailAndPassword(ime: String, email: String, lozinka: String): Result<Unit> {
@@ -125,6 +127,31 @@ class AuthRepositoryImpl @Inject constructor(
                     "description" to description
                 )
             ).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun uploadProfilePicture(uri: Uri): Result<String> {
+        return try {
+            val user = auth.currentUser ?: return Result.failure(Exception("Korisnik nije ulogovan."))
+            val storageRef = storage.reference.child("profile_images/${user.uid}.jpg")
+
+
+            storageRef.putFile(uri).await()
+
+            val downloadUrl = storageRef.downloadUrl.await().toString()
+            Result.success(downloadUrl)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateProfilePictureUrl(url: String): Result<Unit> {
+        return try {
+            val user = auth.currentUser ?: return Result.failure(Exception("Korisnik nije ulogovan."))
+            db.collection("users").document(user.uid).update("profilePictureUrl", url).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

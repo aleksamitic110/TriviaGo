@@ -14,7 +14,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.ogaivirt.triviago.R
+import com.ogaivirt.triviago.data.repository.QuizRepositoryImpl
+import com.ogaivirt.triviago.domain.repository.QuizRepository
+
+
 @Module
 @InstallIn(SingletonComponent::class) // Postoji sve dok apk radi
 object AppModule {
@@ -42,4 +47,20 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideStorage(): FirebaseStorage = FirebaseStorage.getInstance()
+
+
+    @Provides
+    @Singleton
+    fun provideQuizRepository(
+        db: FirebaseFirestore,
+        auth: FirebaseAuth
+    ): QuizRepository {
+        return QuizRepositoryImpl(db, auth)
+    }
+
+
 }

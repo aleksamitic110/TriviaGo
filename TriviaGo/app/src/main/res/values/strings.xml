@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">TriviaGo</string>
+    <string name="web_client_id">560252790685-3dterhqhi82qvqfrsmgpecggon19rahg.apps.googleusercontent.com</string>
+    <string name="google_maps_api_key">AIzaSyCFwgRsvFk6oC4l0NDxIhzsegBPHkMXLZE</string>
+    <string name="google_backend_api_key">AIzaSyAFFYv2SomnMLgtn1-lmCapKSdtpWNNDms</string>
+</resources>
